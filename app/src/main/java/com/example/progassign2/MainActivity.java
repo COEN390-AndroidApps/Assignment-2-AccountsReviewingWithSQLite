@@ -1,5 +1,7 @@
 package com.example.progassign2;
 
+import com.example.progassign2.database.AppDatabase;
+
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +16,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.room.DatabaseConfiguration;
+import androidx.room.InvalidationTracker;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
+import com.example.progassign2.database.AppDatabase;
+import com.example.progassign2.database.dao.StudentsDao;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.progassign2.DialogBox;
 
@@ -24,10 +31,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     TextView title;
     FloatingActionButton addProfile;
-    
     MenuItem item1;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +43,14 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        setUpUi();
+        setUp();
         setOnClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,12 +62,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        switch (id)
-        {
+        switch (id) {
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void setUp()
+    {
+        setUpUi();
+        startDataBase();
+    }
     private void setUpUi(){
         setUpToolbar();
         title=findViewById(R.id.titleProfile);
@@ -73,12 +87,15 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener event = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogBox dialog = new DialogBox();
+                DialogBox dialog = new DialogBox(getApplicationContext());
                 dialog.show(getSupportFragmentManager(), "DialogBox");
             }
         };
         addProfile.setOnClickListener(event);
-
-
     }
+
+    private void startDataBase() {
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+    }
+
 }
