@@ -2,10 +2,12 @@ package com.example.progassign2;
 
 import com.example.progassign2.database.AppDatabase;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,16 +24,24 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
 import com.example.progassign2.database.AppDatabase;
 import com.example.progassign2.database.dao.StudentsDao;
+import com.example.progassign2.database.entities.Students;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.progassign2.DialogBox;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    Toolbar toolbar;
-    TextView title;
-    FloatingActionButton addProfile;
-    MenuItem item1;
+    boolean states=false;
+    private LinearLayout container;
+
+    private Toolbar toolbar;
+    private TextView title;
+    private FloatingActionButton addProfile;
+    private MenuItem item1;
+
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        display(states);
 
     }
 
@@ -62,20 +73,31 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        switch (id) {
+        if(id==R.id.action_clear)
+        {
+            db.studentsDao().clearAll();
+            display(states);
+
+        } else if (id==R.id.action_Sort) {
+            states = !states;
+            display(states);
+
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void setUp()
     {
-        setUpUi();
         startDataBase();
+        setUpUi();
     }
     private void setUpUi(){
         setUpToolbar();
         title=findViewById(R.id.titleProfile);
         addProfile= findViewById(R.id.addProfile);
+        container=findViewById(R.id.scroll);
+        String num = String.valueOf(db.studentsDao().getAll().size());
+        title.setText(num+" profiles");
     }
 
     private void setUpToolbar(){
@@ -83,19 +105,68 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    private void setOnClickListeners(){
-        View.OnClickListener event = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogBox dialog = new DialogBox(getApplicationContext());
-                dialog.show(getSupportFragmentManager(), "DialogBox");
-            }
-        };
-        addProfile.setOnClickListener(event);
+    private void setOnClickListeners() {
+        addProfile.setOnClickListener(v -> {
+            DialogBox dialog = new DialogBox();
+            dialog.show(getSupportFragmentManager(), "DialogBox");
+        });
     }
 
     private void startDataBase() {
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        db = AppDatabase.getInstance(getApplicationContext());
+    }
+
+    void updateProfileCount() {
+        if (db != null) {
+            int count = db.studentsDao().getAll().size();
+            if(!states)
+            {
+                title.setText(count + " profiles by alphabetic order");
+            }
+            else
+            {
+                title.setText(count + " profiles by numeric order");
+            }
+
+        }
+    }
+
+    void display(boolean mode){
+        container.removeAllViews();
+        updateProfileCount();
+        List<Students> list;
+        if(!mode)
+        {
+            list = db.studentsDao().getAllSortedByName();
+        }
+        else {
+            list = db.studentsDao().getAllSortedById();
+
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            Students student = list.get(i);
+            final int index = i;
+            TextView studentTextView = new TextView(this);
+            studentTextView.setText(student.getName() + " " + student.getStudentSurname());
+
+            studentTextView.setTextSize(18);
+            studentTextView.setPadding(10, 10, 10, 10);
+            studentTextView.setClickable(true);
+
+
+            studentTextView.setOnClickListener(v -> {
+                // Open ProfileActivity and pass student details
+                Intent intent = new Intent(MainActivity.this, profileActivity.class);
+                intent.putExtra("student_id", list.get(index).student_id);
+                intent.putExtra("student_name", list.get(index).getName());
+                intent.putExtra("student_surname", list.get(index).getStudentSurname());
+                intent.putExtra("student_gpa", list.get(index).gpa);
+                startActivity(intent);
+            });
+
+            container.addView(studentTextView);
+        }
     }
 
 }

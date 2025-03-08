@@ -18,10 +18,7 @@ import com.example.progassign2.database.entities.Students;
 
 
 public class DialogBox extends DialogFragment {
-    private Context context;
-    public DialogBox(Context context){
-        this.context=context;
-    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -48,22 +45,26 @@ public class DialogBox extends DialogFragment {
 
         // Return data when "Submit" is clicked
         submitButton.setOnClickListener(v -> {
-            String Id = id.getText().toString();
-
+            int Id = Integer.parseInt(id.getText().toString());
             Students student = new Students(Id,name.getText().toString(),surname.getText().toString(),gpa.getText().toString());
             insertOnDataBase(student);
             dismiss();
-
         });
-
         return builder.create();
     }
 
-    private void insertOnDataBase(Students student)
-    {
-        AppDatabase db = AppDatabase.getInstance(context);
+    private void insertOnDataBase(Students student) {
+        AppDatabase db = AppDatabase.getInstance(requireContext());
         db.studentsDao().add(student);
+
+        // Notify MainActivity to refresh UI
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateProfileCount();
+            ((MainActivity) getActivity()).display(((MainActivity) getActivity()).states);
+        }
     }
+
+
 
 }
 

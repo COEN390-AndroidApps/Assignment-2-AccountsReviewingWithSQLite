@@ -42,7 +42,8 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    var room_version = "2.3.0"
+    var room_version = "2.5.0"
     implementation("androidx.room:room-runtime:${room_version}")
     annotationProcessor("androidx.room:room-compiler:${room_version}")
+    implementation ("org.xerial:sqlite-jdbc:3.34.0")
 }

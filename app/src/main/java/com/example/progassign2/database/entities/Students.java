@@ -4,10 +4,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "students_table ")
+@Entity(tableName = "students_table")
 public class Students {
     @PrimaryKey
-    public String student_id;
+    public int student_id;
     @ColumnInfo(name="name")
     public String studentName;
     @ColumnInfo(name="surname")
@@ -15,8 +15,24 @@ public class Students {
     @ColumnInfo(name="gpa")
     public String gpa;
 
+    public String getName()
+    {
+        return studentName;
+    }
 
-    public Students(String student_id, String studentName, String studentSurname, String gpa) {
+    public String getStudentSurname()
+    {
+        return studentSurname;
+    }
+
+    public int getStudent_id()
+    {
+        return student_id;
+    }
+
+
+
+    public Students(int student_id, String studentName, String studentSurname, String gpa) {
         this.student_id = student_id;
         this.studentName = studentName;
         this.studentSurname = studentSurname;
