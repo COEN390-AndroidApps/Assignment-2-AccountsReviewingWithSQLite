@@ -20,11 +20,12 @@ public abstract class AppDatabase extends RoomDatabase {
         return Room.databaseBuilder(context, AppDatabase.class,DB_NAME).allowMainThreadQueries() .build();
     }
 
-    public static synchronized AppDatabase getInstance(Context context)
-    {
-        if(instance ==null)
-        {
-            instance = create(context);
+    public static synchronized AppDatabase getInstance(Context context) {
+        if (instance == null) {
+            instance = Room.databaseBuilder(context, AppDatabase.class, DB_NAME)
+                    .fallbackToDestructiveMigration() // This will delete and recreate the DB when version changes
+                    .allowMainThreadQueries()
+                    .build();
         }
         return instance;
     }

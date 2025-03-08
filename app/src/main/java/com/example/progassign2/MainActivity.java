@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         display(states);
 
     }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true; // This ensures the menu is displayed
