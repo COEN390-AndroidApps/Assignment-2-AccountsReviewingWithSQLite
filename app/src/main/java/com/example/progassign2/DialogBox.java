@@ -1,4 +1,5 @@
 package com.example.progassign2;
+import com.example.progassign2.database.entities.Access;
 import com.example.progassign2.database.entities.Students;
 import com.example.progassign2.database.dao.StudentsDao;
 import androidx.fragment.app.DialogFragment;
@@ -46,8 +47,13 @@ public class DialogBox extends DialogFragment {
         // Return data when "Submit" is clicked
         submitButton.setOnClickListener(v -> {
             int Id = Integer.parseInt(id.getText().toString());
-            Students student = new Students(Id,name.getText().toString(),surname.getText().toString(),gpa.getText().toString());
+            long currTime = System.currentTimeMillis();
+            Students student = new Students(Id,name.getText().toString(),surname.getText().toString(),gpa.getText().toString(), currTime);
             insertOnDataBase(student);
+
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+            db.accessDao().insertLog(new Access(Id, currTime, "CREATED"));
+
             dismiss();
         });
         return builder.create();

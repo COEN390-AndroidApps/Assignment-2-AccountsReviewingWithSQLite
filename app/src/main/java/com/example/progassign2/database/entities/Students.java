@@ -14,6 +14,8 @@ public class Students {
     public String studentSurname;
     @ColumnInfo(name="gpa")
     public String gpa;
+    @ColumnInfo(name="creation-time")
+    public long creationTime;
 
     public String getName()
     {
@@ -31,11 +33,11 @@ public class Students {
     }
 
 
-
-    public Students(int student_id, String studentName, String studentSurname, String gpa) {
+    public Students(int student_id, String studentName, String studentSurname, String gpa, long creationTime) {
         this.student_id = student_id;
         this.studentName = studentName;
         this.studentSurname = studentSurname;
         this.gpa = gpa;
+        this.creationTime = creationTime;
     }
 }

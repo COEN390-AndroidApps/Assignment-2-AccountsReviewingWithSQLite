@@ -11,6 +11,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.progassign2.database.AppDatabase;
+import com.example.progassign2.database.entities.Access;
+
+import java.util.List;
+
 public class profileActivity extends AppCompatActivity {
     private TextView name,surname,gpa,id;
 
@@ -27,6 +32,21 @@ public class profileActivity extends AppCompatActivity {
             return insets;
         });
         setUp();
+        int studentId = getIntent().getIntExtra("student_id", -1);
+        if (studentId != -1) {
+            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+            db.accessDao().insertLog(new Access(studentId, System.currentTimeMillis(), "ACCESSED"));
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        int studentId = getIntent().getIntExtra("student_id", -1);
+        if (studentId != -1) {
+            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+            db.accessDao().insertLog(new Access(studentId, System.currentTimeMillis(), "CLOSED"));
+        }
     }
     private void setUp(){
 
@@ -52,21 +72,32 @@ public class profileActivity extends AppCompatActivity {
         }
         toolbar.setNavigationOnClickListener(v -> finish());
     }
-    private void getDisplayIntent()
-    {
+    private void getDisplayIntent() {
         Intent intent = getIntent();
 
         if (intent != null) {
-            int studentId = intent.getIntExtra("student_id", -1); // Default to -1 if not found
+            int studentId = intent.getIntExtra("student_id", -1);
             String studentName = intent.getStringExtra("student_name");
             String studentSurname = intent.getStringExtra("student_surname");
             String studentGpa = intent.getStringExtra("student_gpa");
 
-            // Display student details
             id.setText("ID: " + studentId);
             name.setText("Name: " + studentName);
             surname.setText("Surname: " + studentSurname);
             gpa.setText("GPA: " + studentGpa);
+
+            // Get Access Logs
+            AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+            List<Access> logs = db.accessDao().getLogsForStudent(studentId);
+
+            // Convert logs to string format
+            StringBuilder logsText = new StringBuilder();
+            for (Access log : logs) {
+                logsText.append(log.action).append(" at ").append(new java.util.Date(log.timestamp)).append("\n");
+            }
+
+            TextView logsView = findViewById(R.id.textViewAccessLogs);
+            logsView.setText(logsText.toString());
         }
     }
 }
